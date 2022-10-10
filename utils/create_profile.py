@@ -9,15 +9,41 @@ from string import ascii_uppercase
 import numpy as np
 import plotly.graph_objects as go
 from numpy.random import dirichlet
-
+from numpy.random import uniform
+from numpy.random import beta
+from numpy.random import shuffle
 
 def main():
-    for i in range(50):
-        domain = Domain.create_random(f"domain{i:02d}")
-        domain.calculate_specials()
-        domain.generate_visualisation()
-        domain.to_file("domains/")
+    np.random.seed(100)
+    gen_domains("domains/basic/", n=50)
+    np.random.seed(101)
+    gen_domains("domains/i8v5/", n=50, issue_count=8, value_count=5, extra=False)
+    np.random.seed(102)
+    gen_domains("domains/i2v5/", n=50, issue_count=2, value_count=5)
+    np.random.seed(103)
+    gen_domains("domains/i5v2/", n=50, issue_count=5, value_count=2)
+    np.random.seed(104)
+    gen_domains("domains/i5v10/", n=50, issue_count=5, value_count=10, extra=False)
+    np.random.seed(105)
+    gen_domains("domains/o-5/", n=50, opposition=-0.5)
+    np.random.seed(106)
+    gen_domains("domains/o+5/", n=50, opposition=0.5)
+    np.random.seed(107)
+    gen_domains("domains/l+5/", n=50, lopsided=0.5)
+    # for i in range(50):
+    #     domain = Domain.create_random(f"domain{i:02d}")
+    #     domain.calculate_specials()
+    #     domain.generate_visualisation()
+    #     domain.to_file("domains/")
 
+def gen_domains(folder, n=1, issue_count=None, value_count=None, opposition=None, lopsided=None, extra=True):
+    os.makedirs(folder, exist_ok=True)
+    for i in range(n):
+        domain = Domain.create_random_new(f"domain{i:02d}", issue_count, value_count, opposition, lopsided)
+        if extra:
+            domain.calculate_specials()
+            domain.generate_visualisation()
+        domain.to_file(f"{folder}")
 
 class Profile:
     def __init__(self, profile, issue_weights, value_weights):
@@ -43,6 +69,66 @@ class Profile:
             value_weights[issue] = issue_value_weights
 
         return cls(profile, issue_weights, value_weights)
+
+    @classmethod
+    def create_2_random_new(cls, domain, name_a, name_b, opposition=None, lopsided=None):
+        def dirichlet_dist(names, mode, alpha):
+            distribution = (dirichlet(alpha) * 100000).astype(int)
+            if mode == "issues":
+                distribution[0] += 100000 - np.sum(distribution)
+            if mode == "values":
+                # distribution = [100000] + [100000 * random() for _ in range(len(names) - 1)]
+                # shuffle(distribution)
+                # distribution = np.array(distribution).astype(int)
+                # distribution = (dirichlet(np.array(range(len(names))) * 0.3 + 1.0) * 100000).astype(int)
+                # shuffle(distribution)
+                distribution = distribution - np.min(distribution)
+                distribution = (distribution * 100000 / np.max(distribution)).astype(
+                    int
+                )
+            distribution = distribution / 100000
+            return {i: w for i, w in zip(names, distribution)}
+        issues = list(domain["issuesValues"].keys())
+        alpha_seed = np.linspace(-1.0, 1.0, len(issues), endpoint=True)
+        alpha_base = np.repeat(1.0, len(issues))
+        shuffle(alpha_seed)
+        alpha_a = np.abs(opposition) * alpha_seed + alpha_base
+        alpha_b = -opposition * alpha_seed + alpha_base
+        issue_weights_a = dirichlet_dist(issues, "issues", alpha_a)
+        issue_weights_b = dirichlet_dist(issues, "issues", alpha_b)
+        value_weights_a = {}
+        value_weights_b = {}
+        for issue in issues:
+            values = domain["issuesValues"][issue]["values"]
+            value_weights_a[issue] = dirichlet_dist(values, "values", alpha=np.repeat(1, len(values)))
+            if lopsided > 0.0:
+                value_weights_a[value_weights_a > 0] = (1 - lopsided) * value_weights_a[value_weights_a > 0] + lopsided
+            value_weights_b[issue] = dirichlet_dist(values, "values", alpha=np.repeat(1, len(values)))
+            if lopsided < 0.0:
+                value_weights_b[value_weights_b > 0] = (1 + lopsided) * value_weights_b[value_weights_b > 0] - lopsided
+        issue_utilities_a = {
+            i: {"DiscreteValueSetUtilities": {"valueUtilities": value_weights_a[i]}} for i in issues
+        }
+        issue_utilities_b = {
+            i: {"DiscreteValueSetUtilities": {"valueUtilities": value_weights_b[i]}} for i in issues
+        }
+        profile_a = {
+            "LinearAdditiveUtilitySpace": {
+                "issueUtilities": issue_utilities_a,
+                "issueWeights": issue_weights_a,
+                "domain": domain,
+                "name": name_a,
+            }
+        }
+        profile_b = {
+            "LinearAdditiveUtilitySpace": {
+                "issueUtilities": issue_utilities_b,
+                "issueWeights": issue_weights_b,
+                "domain": domain,
+                "name": name_b,
+            }
+        }
+        return cls(profile_a, issue_weights_a, value_weights_a), cls(profile_b, issue_weights_b, value_weights_b)
 
     @classmethod
     def create_random(cls, domain, name):
@@ -119,6 +205,45 @@ class Domain:
         self.pareto_front = pareto_front
         self.opposition = opposition
         self.visualisation = visualisation
+
+    @classmethod
+    def create_random_new(cls, name, issue_count=None, value_count=None, opposition=None, lopsided=None):
+        
+        # def random_values(num_values):
+        #     values = [f"value_{x}" for x in ascii_uppercase[:num_values]]
+        #     return {"values": values}
+        if issue_count is None and value_count is None:
+            domain_size = randint(200, 10000)
+            print(name)
+            # print(domain_size)
+            while True:
+                num_issues = randint(4, 10)
+                spread = dirichlet([1] * num_issues)
+                multiplier = (domain_size / np.prod(spread)) ** (1.0 / randint(3, 7))
+                values_per_issue = np.round(multiplier * spread).astype(np.int32)
+                values_per_issue = np.clip(values_per_issue, 2, None)
+                if abs(domain_size - np.prod(values_per_issue)) < (0.1 * domain_size):
+                    # print(np.prod(values_per_issue))
+                    break
+            issues = list(ascii_uppercase[:num_issues])
+        else:
+            num_issues = issue_count
+            values_per_issue = np.repeat(value_count, issue_count)
+            issues = list(ascii_uppercase[:num_issues])
+
+        issuesValues = {}
+        for issue, num_values in zip(issues, values_per_issue):
+            values = {"values": [f"value{x}" for x in ascii_uppercase[:num_values]]}
+            issuesValues[f"issue{issue}"] = values
+
+        domain = {"name": name, "issuesValues": issuesValues}
+        if opposition is None:
+            opposition = 0.0
+        if lopsided is None:
+            lopsided = 0.0
+        profile_A, profile_B = Profile.create_2_random_new(domain, "profileA", "profileB", opposition, lopsided)
+        return cls(domain, profile_A, profile_B)
+
 
     @classmethod
     def create_random(cls, name):
