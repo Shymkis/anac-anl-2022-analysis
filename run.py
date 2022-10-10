@@ -22,11 +22,11 @@ settings = {
             "parameters": {"storage_dir": "agent_storage/BoulwareAgent"},
         },
         {
-            "class": "agents.micro_agent.micro_agent.MiCROAgent",
-            "parameters": {"storage_dir": "agent_storage/MiCROAgent"},
+            "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
+            "parameters": {"storage_dir": "agent_storage/BoulwareAgent"},
         },
     ],
-    "profiles": ["domains/domain00/profileA.json", "domains/domain00/profileB.json"],
+    "profiles": ["domains/domain02/profileA.json", "domains/domain02/profileB.json"],
     "deadline_time_ms": 10000,
 }
 
