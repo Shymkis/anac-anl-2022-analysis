@@ -25,6 +25,15 @@ tournament_settings = {
             "class": "agents.conceder_agent.conceder_agent.ConcederAgent",
         },
         {
+            "class": "agents.conceder_agent.conceder_agent.ConcederAgent",
+        },
+        {
+            "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
+        },
+        {
+            "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
+        },
+        {
             "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
         },
         {
@@ -33,14 +42,23 @@ tournament_settings = {
         {
             "class": "agents.micro_agent.micro_agent.MiCROAgent",
         },
+        {
+            "class": "agents.micro_agent.micro_agent.MiCROAgent",
+        },
+        {
+            "class": "agents.micro_agent.micro_agent.MiCROAgent",
+        },
+        {
+            "class": "agents.micro_agent.micro_agent.MiCROAgent",
+        },
     ],
     "profile_sets": [
         ["domains/domain02/profileA.json", "domains/domain02/profileB.json"],
-        ["domains/domain05/profileA.json", "domains/domain05/profileB.json"],
-        ["domains/domain13/profileA.json", "domains/domain13/profileB.json"],
-        ["domains/domain06/profileA.json", "domains/domain06/profileB.json"],
-        ["domains/domain40/profileA.json", "domains/domain40/profileB.json"],
-        ["domains/domain46/profileA.json", "domains/domain46/profileB.json"],
+        # ["domains/domain05/profileA.json", "domains/domain05/profileB.json"],
+        # ["domains/domain13/profileA.json", "domains/domain13/profileB.json"],
+        # ["domains/domain06/profileA.json", "domains/domain06/profileB.json"],
+        # ["domains/domain40/profileA.json", "domains/domain40/profileB.json"],
+        # ["domains/domain46/profileA.json", "domains/domain46/profileB.json"],
     ],
     "deadline_time_ms": 10000,
 }

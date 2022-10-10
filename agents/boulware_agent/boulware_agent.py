@@ -1,6 +1,6 @@
 from agents.time_dependent_agent.time_dependent_agent import TimeDependentAgent
 from tudelft_utilities_logging.Reporter import Reporter
-
+from numpy.random import uniform
 
 class BoulwareAgent(TimeDependentAgent):
     """
@@ -10,6 +10,7 @@ class BoulwareAgent(TimeDependentAgent):
 
     def __init__(self, reporter: Reporter = None):
         super().__init__(reporter)
+        self._sampledE: float = uniform(0.1, 0.4)
 
     # Override
     def getDescription(self) -> str:
@@ -20,4 +21,4 @@ class BoulwareAgent(TimeDependentAgent):
 
     # Override
     def getE(self) -> float:
-        return 0.2
+        return self._sampledE
