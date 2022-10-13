@@ -17,6 +17,7 @@ from geniusweb.protocol.session.saop.SAOPState import SAOPState
 from geniusweb.simplerunner.ClassPathConnectionFactory import ClassPathConnectionFactory
 from geniusweb.simplerunner.NegoRunner import StdOutReporter
 from geniusweb.simplerunner.Runner import Runner
+from geniusweb.deadline.DeadlineGauss import DeadlineGauss
 from pyson.ObjectMapper import ObjectMapper
 from uri.uri import URI
 
@@ -27,6 +28,17 @@ def run_session(settings) -> Tuple[dict, dict]:
     agents = settings["agents"]
     profiles = settings["profiles"]
     deadline_time_ms = settings["deadline_time_ms"]
+    settings: dict = settings
+    means = settings.get("means", [1.0])
+    stdevs = settings.get("stdevs", [0.2])
+    if "seed" not in settings:
+        from numpy.random import default_rng
+        seed = int(default_rng().integers(0, 2 ** 63 - 1))
+    else:
+        seed = settings.get("seed")
+    endtime = settings.get("endtime", 100.0)
+    durationms = settings.get("durationms", 60000)
+
 
     # quick and dirty checks
     assert isinstance(agents, list) and len(agents) == 2
@@ -79,8 +91,9 @@ def run_session(settings) -> Tuple[dict, dict]:
                     }
                 },
             ],
-            # "deadline": {"DeadlineRounds": {"rounds": rounds, "durationms": 60000}},
-            "deadline": {"DeadlineTime": {"durationms": deadline_time_ms}},
+            #"deadline": {"DeadlineRounds": {"rounds": 200, "durationms": 60000}},
+            "deadline": {"DeadlineGauss": {"means": means, "stdevs": stdevs, "seed": seed, "endtime": endtime, "durationms": durationms}},
+            # "deadline": {"DeadlineTime": {"durationms": deadline_time_ms}},
         }
     }
 

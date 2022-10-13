@@ -29,6 +29,7 @@ from geniusweb.profileconnection.ProfileConnectionFactory import (
     ProfileConnectionFactory,
 )
 from geniusweb.progress.ProgressRounds import ProgressRounds
+from geniusweb.progress.ProgressGauss import ProgressGauss
 from geniusweb.utils import val
 from geniusweb.profileconnection.ProfileInterface import ProfileInterface
 from geniusweb.profile.utilityspace.LinearAdditive import LinearAdditive
@@ -201,7 +202,7 @@ class TimeDependentAgent(DefaultParty):
         else:
             return
         # if we get here, round must be increased.
-        if isinstance(self._progress, ProgressRounds):
+        if isinstance(self._progress, ProgressRounds) or isinstance(self._progress, ProgressGauss):
             self._progress = self._progress.advance()
 
     def _myTurn(self):

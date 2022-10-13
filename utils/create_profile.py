@@ -14,20 +14,24 @@ from numpy.random import beta
 from numpy.random import shuffle
 
 def main():
-    np.random.seed(100)
-    gen_domains("domains/basic/", n=50)
-    np.random.seed(101)
-    gen_domains("domains/i8v5/", n=50, issue_count=8, value_count=5, extra=False)
-    np.random.seed(102)
-    gen_domains("domains/i2v5/", n=50, issue_count=2, value_count=5)
-    np.random.seed(103)
-    gen_domains("domains/i5v2/", n=50, issue_count=5, value_count=2)
-    np.random.seed(104)
-    gen_domains("domains/i5v10/", n=50, issue_count=5, value_count=10, extra=False)
-    np.random.seed(105)
-    gen_domains("domains/o-5/", n=50, opposition=-0.5)
-    np.random.seed(106)
-    gen_domains("domains/o+5/", n=50, opposition=0.5)
+    #domain = Domain.create_random(f"domainTest")
+    #domain.calculate_specials()
+    #domain.generate_visualisation()
+    #domain.to_file("domains/test/")
+    #np.random.seed(100)
+    #gen_domains("domains/basic/", n=50)
+    #np.random.seed(101)
+    #gen_domains("domains/i8v5/", n=50, issue_count=8, value_count=5, extra=False)
+    #np.random.seed(102)
+    #gen_domains("domains/i2v5/", n=50, issue_count=2, value_count=5)
+    #np.random.seed(103)
+    #gen_domains("domains/i5v2/", n=50, issue_count=5, value_count=2)
+    #np.random.seed(104)
+    #gen_domains("domains/i5v10/", n=50, issue_count=5, value_count=10, extra=False)
+    #np.random.seed(105)
+    #gen_domains("domains/o-5/", n=50, opposition=-0.5)
+    #np.random.seed(106)
+    #gen_domains("domains/o+5/", n=50, opposition=0.5)
     np.random.seed(107)
     gen_domains("domains/l+5/", n=50, lopsided=0.5)
     # for i in range(50):
@@ -72,7 +76,7 @@ class Profile:
 
     @classmethod
     def create_2_random_new(cls, domain, name_a, name_b, opposition=None, lopsided=None):
-        def dirichlet_dist(names, mode, alpha):
+        def dirichlet_dist(names, mode, alpha, lopsided=None):
             distribution = (dirichlet(alpha) * 100000).astype(int)
             if mode == "issues":
                 distribution[0] += 100000 - np.sum(distribution)
@@ -83,9 +87,12 @@ class Profile:
                 # distribution = (dirichlet(np.array(range(len(names))) * 0.3 + 1.0) * 100000).astype(int)
                 # shuffle(distribution)
                 distribution = distribution - np.min(distribution)
-                distribution = (distribution * 100000 / np.max(distribution)).astype(
-                    int
-                )
+                distribution = (distribution * 100000.0 / np.max(distribution)).astype(int)
+                # distribution = distribution.astype(int)
+                if lopsided is not None and lopsided > 0:
+                    reward = lopsided * np.max(distribution)
+                    distribution[distribution > 0] = ((1 - lopsided) * distribution[distribution > 0] + reward)
+                distribution = distribution.astype(int)
             distribution = distribution / 100000
             return {i: w for i, w in zip(names, distribution)}
         issues = list(domain["issuesValues"].keys())
@@ -98,14 +105,12 @@ class Profile:
         issue_weights_b = dirichlet_dist(issues, "issues", alpha_b)
         value_weights_a = {}
         value_weights_b = {}
+        if lopsided is None:
+            lopsided = 0
         for issue in issues:
             values = domain["issuesValues"][issue]["values"]
-            value_weights_a[issue] = dirichlet_dist(values, "values", alpha=np.repeat(1, len(values)))
-            if lopsided > 0.0:
-                value_weights_a[value_weights_a > 0] = (1 - lopsided) * value_weights_a[value_weights_a > 0] + lopsided
-            value_weights_b[issue] = dirichlet_dist(values, "values", alpha=np.repeat(1, len(values)))
-            if lopsided < 0.0:
-                value_weights_b[value_weights_b > 0] = (1 + lopsided) * value_weights_b[value_weights_b > 0] - lopsided
+            value_weights_a[issue] = dirichlet_dist(values, "values", alpha=np.repeat(1.0, len(values)), lopsided=lopsided)
+            value_weights_b[issue] = dirichlet_dist(values, "values", alpha=np.repeat(1.0, len(values)), lopsided=-lopsided)
         issue_utilities_a = {
             i: {"DiscreteValueSetUtilities": {"valueUtilities": value_weights_a[i]}} for i in issues
         }
