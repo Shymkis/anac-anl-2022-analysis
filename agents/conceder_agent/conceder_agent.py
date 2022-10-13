@@ -1,6 +1,6 @@
 from agents.time_dependent_agent.time_dependent_agent import TimeDependentAgent
 from tudelft_utilities_logging.Reporter import Reporter
-from numpy.random import uniform
+from numpy.random import gamma
 
 class ConcederAgent(TimeDependentAgent):
     """
@@ -10,7 +10,7 @@ class ConcederAgent(TimeDependentAgent):
 
     def __init__(self, reporter: Reporter = None):
         super().__init__(reporter)
-        self._sampledE: float = uniform(1.0, 4.0)
+        self._sampledE: float = 1 + gamma(4, 0.5)
 
     # Override
     def getDescription(self) -> str:

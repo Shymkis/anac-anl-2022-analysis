@@ -18,12 +18,12 @@ if not RESULTS_DIR.exists():
 settings = {
     "agents": [
         {
-            "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
-            "parameters": {"storage_dir": "agent_storage/BoulwareAgent"},
+            "class": "agents.hardliner_agent.hardliner_agent.HardlinerAgent",
+            "parameters": {"storage_dir": "agent_storage/HardlinerAgent"},
         },
         {
-            "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
-            "parameters": {"storage_dir": "agent_storage/BoulwareAgent"},
+            "class": "agents.conceder_agent.conceder_agent.ConcederAgent",
+            "parameters": {"storage_dir": "agent_storage/ConcederAgent"},
         },
     ],
     "profiles": ["domains/domain02/profileA.json", "domains/domain02/profileB.json"],
