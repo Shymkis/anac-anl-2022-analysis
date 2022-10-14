@@ -32,21 +32,45 @@ def main():
     #gen_domains("domains/o-5/", n=50, opposition=-0.5)
     #np.random.seed(106)
     #gen_domains("domains/o+5/", n=50, opposition=0.5)
-    np.random.seed(107)
-    gen_domains("domains/l+5/", n=50, lopsided=0.5)
+    #np.random.seed(107)
+    #gen_domains("domains/l+5/", n=50, lopsided=0.5)
+    #np.random.seed(108)
+    #gen_domains("domains/o-8/", n=50, opposition=-0.8)
+    #np.random.seed(109)
+    #gen_domains("domains/o+8/", n=50, opposition=0.8)
+    np.random.seed(110)
+    gen_domains("domains/o2-8/", n=50, opposition_2=-0.8)
+    np.random.seed(111)
+    gen_domains("domains/o2+8/", n=50, opposition_2=0.8)
+    #np.random.seed(110)
+    #gen_domains("domains/test_2/", n=4, opposition_2=0.6)
     # for i in range(50):
     #     domain = Domain.create_random(f"domain{i:02d}")
     #     domain.calculate_specials()
     #     domain.generate_visualisation()
     #     domain.to_file("domains/")
 
-def gen_domains(folder, n=1, issue_count=None, value_count=None, opposition=None, lopsided=None, extra=True):
+def gen_domains(folder, n=1, issue_count=None, value_count=None, opposition=None, lopsided=None, extra=True, opposition_2=None):
     os.makedirs(folder, exist_ok=True)
-    for i in range(n):
+    big_n = n
+    if opposition_2 is not None and opposition_2 != 0.0:
+        if not extra:
+            raise Exception("extra must be True to use opposition_2")
+        big_n = int(n / (1.0 - abs(opposition_2)))
+    domains = []
+    for i in range(big_n):
         domain = Domain.create_random_new(f"domain{i:02d}", issue_count, value_count, opposition, lopsided)
         if extra:
             domain.calculate_specials()
             domain.generate_visualisation()
+        domains.append(domain)
+    if opposition_2 is not None and opposition_2 != 0.0:
+        domain_sorted = sorted(domains, key=lambda d: d.opposition)
+        if opposition_2 < 0.0:
+            domains = domain_sorted[0:n]
+        else:
+            domains = domain_sorted[-n:]
+    for domain in domains:
         domain.to_file(f"{folder}")
 
 class Profile:

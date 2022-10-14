@@ -40,6 +40,10 @@ def main():
         "lp5": get_domains("domains/l+5/"),
         "o_5": get_domains("domains/o-5/"),
         "op5": get_domains("domains/o+5/"),
+        "o_8": get_domains("domains/o-8/"),
+        "op8": get_domains("domains/o+8/"),
+        "o2_8": get_domains("domains/o2-8/"),
+        "o2p8": get_domains("domains/o2+8/"),
     }
 
     for catname, domains in categories.items():

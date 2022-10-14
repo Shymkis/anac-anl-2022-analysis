@@ -1,5 +1,10 @@
-venv
-!venv\Lib\site-packages\geniusweb
+venv/*
+!venv/Lib/
+venv/Lib/*
+!venv/Lib/site-packages/
+venv/Lib/site-packages/*
+!venv/Lib/site-packages/geniusweb/
+
 .venv
 .vscode
 __pycache__
