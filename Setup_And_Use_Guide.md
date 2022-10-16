@@ -25,7 +25,7 @@ Delete venv by deleting venv folder
   - `venv/lib/python3.10/site-packages/` for Linux (Probably replace python3.10 with your python version)
 5. Create domains
   5.1 There are two ways to create the domains:
-  - To recreate the domains, run `python utils/create_profiles.py`.
+  - To recreate the domains, run `python utils/create_profile.py`.
     You may comment or uncomment lines in the "main" function to generate only some of the domains, 
 	but don't uncomment the np.random.seed() lines
   - To use existing domains, unzip domains.zip. Be sure that the directory structure 
