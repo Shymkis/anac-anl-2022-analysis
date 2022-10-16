@@ -14,41 +14,45 @@ from numpy.random import beta
 from numpy.random import shuffle
 
 def main():
-    #domain = Domain.create_random(f"domainTest")
-    #domain.calculate_specials()
-    #domain.generate_visualisation()
-    #domain.to_file("domains/test/")
-    #np.random.seed(100)
-    #gen_domains("domains/basic/", n=50)
-    #np.random.seed(101)
-    #gen_domains("domains/i8v5/", n=50, issue_count=8, value_count=5, extra=False)
-    #np.random.seed(102)
-    #gen_domains("domains/i2v5/", n=50, issue_count=2, value_count=5)
-    #np.random.seed(103)
-    #gen_domains("domains/i5v2/", n=50, issue_count=5, value_count=2)
-    #np.random.seed(104)
-    #gen_domains("domains/i5v10/", n=50, issue_count=5, value_count=10, extra=False)
-    #np.random.seed(105)
-    #gen_domains("domains/o-5/", n=50, opposition=-0.5)
-    #np.random.seed(106)
-    #gen_domains("domains/o+5/", n=50, opposition=0.5)
-    #np.random.seed(107)
-    #gen_domains("domains/l+5/", n=50, lopsided=0.5)
-    #np.random.seed(108)
-    #gen_domains("domains/o-8/", n=50, opposition=-0.8)
-    #np.random.seed(109)
-    #gen_domains("domains/o+8/", n=50, opposition=0.8)
+    np.random.seed(100)
+    gen_domains("domains/basic/", n=50)
+
+    np.random.seed(101)
+    gen_domains("domains/i8v5/", n=50, issue_count=8, value_count=5, extra=False)
+    
+    np.random.seed(102)
+    gen_domains("domains/i2v5/", n=50, issue_count=2, value_count=5)
+    
+    np.random.seed(103)
+    gen_domains("domains/i5v2/", n=50, issue_count=5, value_count=2)
+    
+    np.random.seed(104)
+    gen_domains("domains/i5v10/", n=50, issue_count=5, value_count=10, extra=False)
+    
+    np.random.seed(105)
+    gen_domains("domains/o-5/", n=50, opposition=-0.5)
+    
+    np.random.seed(106)
+    gen_domains("domains/o+5/", n=50, opposition=0.5)
+    
+    np.random.seed(107)
+    gen_domains("domains/l+5/", n=50, lopsided=0.5)
+    
+    np.random.seed(108)
+    gen_domains("domains/o-8/", n=50, opposition=-0.8)
+    
+    np.random.seed(109)
+    gen_domains("domains/o+8/", n=50, opposition=0.8)
+    
     np.random.seed(110)
     gen_domains("domains/o2-8/", n=50, opposition_2=-0.8)
+    
     np.random.seed(111)
     gen_domains("domains/o2+8/", n=50, opposition_2=0.8)
-    #np.random.seed(110)
-    #gen_domains("domains/test_2/", n=4, opposition_2=0.6)
-    # for i in range(50):
-    #     domain = Domain.create_random(f"domain{i:02d}")
-    #     domain.calculate_specials()
-    #     domain.generate_visualisation()
-    #     domain.to_file("domains/")
+    
+    np.random.seed(110)
+    gen_domains("domains/test_2/", n=4, opposition_2=0.6)
+
 
 def gen_domains(folder, n=1, issue_count=None, value_count=None, opposition=None, lopsided=None, extra=True, opposition_2=None):
     os.makedirs(folder, exist_ok=True)
@@ -72,6 +76,13 @@ def gen_domains(folder, n=1, issue_count=None, value_count=None, opposition=None
             domains = domain_sorted[-n:]
     for domain in domains:
         domain.to_file(f"{folder}")
+
+    def gen_original():
+        for i in range(50):
+            domain = Domain.create_random(f"domain{i:02d}")
+            domain.calculate_specials()
+            domain.generate_visualisation()
+            domain.to_file("domains/")
 
 class Profile:
     def __init__(self, profile, issue_weights, value_weights):
