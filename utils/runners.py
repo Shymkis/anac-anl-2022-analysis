@@ -3,7 +3,9 @@ import shutil
 from collections import defaultdict
 from itertools import permutations
 from math import factorial, prod
+import os
 from pathlib import Path
+from random import choice
 from typing import List, Tuple
 
 import pandas as pd
@@ -21,7 +23,6 @@ from geniusweb.simplerunner.Runner import Runner
 from geniusweb.deadline.DeadlineGauss import DeadlineGauss
 from pyson.ObjectMapper import ObjectMapper
 from uri.uri import URI
-import random
 
 from utils.ask_proceed import ask_proceed
 
@@ -192,11 +193,16 @@ def sample_agents(agent_distribution, n = 2):
     hardliners = [{"class": "agents.hardliner_agent.hardliner_agent.HardlinerAgent"}] * agent_distribution["hardliner"]
     micros = [{"class": "agents.micro_agent.micro_agent.MiCROAgent"}] * agent_distribution["micro"]
     c = conceders + boulwares + hardliners + micros
-    agents = [random.choice(c) for _ in range(n)]
-    return list(agents)
+    agents = [choice(c) for _ in range(n)]
+    return agents
 
 def sample_profiles(profile_set):
-    return ["domains/basic/domain02/profileA.json", "domains/basic/domain02/profileB.json"]
+    d = get_immediate_subdirectories(profile_set)
+    domain = choice(d)
+    return [profile_set + "/" + domain + "/profileA.json", profile_set+ "/" + domain + "/profileB.json"]
+
+def get_immediate_subdirectories(a_dir):
+    return [name for name in os.listdir(a_dir) if os.path.isdir(os.path.join(a_dir, name))]
 
 def process_results(results_class: SAOPState, results_dict: dict):
     # dict to translate geniusweb agent reference to Python class name
