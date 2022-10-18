@@ -24,33 +24,15 @@ tournament_settings = {
         {
             "class": "agents.conceder_agent.conceder_agent.ConcederAgent",
         },
-        # {
-        #     "class": "agents.conceder_agent.conceder_agent.ConcederAgent",
-        # },
-         {
-             "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
-         },
-        # {
-        #     "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
-        # },
-        # {
-        #     "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
-        # },
+        {
+            "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
+        },
         # {
         #     "class": "agents.hardliner_agent.hardliner_agent.HardlinerAgent",
         # },
         # {
         #     "class": "agents.micro_agent.micro_agent.MiCROAgent",
         # },
-        # {
-        #     "class": "agents.micro_agent.micro_agent.MiCROAgent",
-        # },
-        # {
-        #     "class": "agents.micro_agent.micro_agent.MiCROAgent",
-        # },
-        #{
-        #    "class": "agents.micro_agent.micro_agent.MiCROAgent",
-        #},
     ],
     "profile_sets": [
         ["domains/basic/domain02/profileA.json", "domains/basic/domain02/profileB.json"],
