@@ -1,9 +1,10 @@
+from http.client import SWITCHING_PROTOCOLS
 import shutil
 from collections import defaultdict
 from itertools import permutations
 from math import factorial, prod
 from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 
 import pandas as pd
 from geniusweb.profile.utilityspace.LinearAdditiveUtilitySpace import (
@@ -20,6 +21,7 @@ from geniusweb.simplerunner.Runner import Runner
 from geniusweb.deadline.DeadlineGauss import DeadlineGauss
 from pyson.ObjectMapper import ObjectMapper
 from uri.uri import URI
+import random
 
 from utils.ask_proceed import ask_proceed
 
@@ -165,7 +167,7 @@ def run_marketplace(marketplace_settings: dict) -> Tuple[list, list]:
 
     marketplace_results = []
     marketplace_steps = []
-    for _ in range(2):
+    for _ in range(100):
         # create session settings dict
         settings = {
             "agents": sample_agents(agent_distribution),
@@ -185,14 +187,13 @@ def run_marketplace(marketplace_settings: dict) -> Tuple[list, list]:
     return marketplace_steps, marketplace_results, marketplace_results_summary
 
 def sample_agents(agent_distribution, n = 2):
-    return [
-        {
-            "class": "agents.conceder_agent.conceder_agent.ConcederAgent",
-        },
-        {
-            "class": "agents.boulware_agent.boulware_agent.BoulwareAgent",
-        }
-    ]
+    conceders = [{"class": "agents.conceder_agent.conceder_agent.ConcederAgent"}] * agent_distribution["conceder"]
+    boulwares = [{"class": "agents.boulware_agent.boulware_agent.BoulwareAgent"}] * agent_distribution["boulware"]
+    hardliners = [{"class": "agents.hardliner_agent.hardliner_agent.HardlinerAgent"}] * agent_distribution["hardliner"]
+    micros = [{"class": "agents.micro_agent.micro_agent.MiCROAgent"}] * agent_distribution["micro"]
+    c = conceders + boulwares + hardliners + micros
+    agents = [random.choice(c) for _ in range(n)]
+    return list(agents)
 
 def sample_profiles(profile_set):
     return ["domains/basic/domain02/profileA.json", "domains/basic/domain02/profileB.json"]
