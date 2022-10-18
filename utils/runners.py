@@ -1,9 +1,12 @@
+from http.client import SWITCHING_PROTOCOLS
 import shutil
 from collections import defaultdict
 from itertools import permutations
 from math import factorial, prod
+import os
 from pathlib import Path
-from typing import Tuple
+from random import choice
+from typing import List, Tuple
 
 import pandas as pd
 from geniusweb.profile.utilityspace.LinearAdditiveUtilitySpace import (
@@ -157,6 +160,49 @@ def run_tournament(tournament_settings: dict) -> Tuple[list, list]:
 
     return tournament_steps, tournament_results, tournament_results_summary
 
+def run_marketplace(marketplace_settings: dict) -> Tuple[list, list]:
+    # create agent permutations, ensures that every agent plays against every other agent on both sides of a profile set.
+    agent_distribution = marketplace_settings["agent_distribution"]
+    profile_set = marketplace_settings["profile_set"]
+    deadline_time_ms = marketplace_settings["deadline_time_ms"]
+
+    marketplace_results = []
+    marketplace_steps = []
+    for _ in range(100):
+        # create session settings dict
+        settings = {
+            "agents": sample_agents(agent_distribution),
+            "profiles": sample_profiles(profile_set),
+            "deadline_time_ms": deadline_time_ms,
+        }
+
+        # run a single negotiation session
+        _, session_results_summary = run_session(settings)
+
+        # assemble results
+        marketplace_steps.append(settings)
+        marketplace_results.append(session_results_summary)
+
+    marketplace_results_summary = process_marketplace_results(marketplace_results)
+
+    return marketplace_steps, marketplace_results, marketplace_results_summary
+
+def sample_agents(agent_distribution, n = 2):
+    conceders = [{"class": "agents.conceder_agent.conceder_agent.ConcederAgent"}] * agent_distribution["conceder"]
+    boulwares = [{"class": "agents.boulware_agent.boulware_agent.BoulwareAgent"}] * agent_distribution["boulware"]
+    hardliners = [{"class": "agents.hardliner_agent.hardliner_agent.HardlinerAgent"}] * agent_distribution["hardliner"]
+    micros = [{"class": "agents.micro_agent.micro_agent.MiCROAgent"}] * agent_distribution["micro"]
+    c = conceders + boulwares + hardliners + micros
+    agents = [choice(c) for _ in range(n)]
+    return agents
+
+def sample_profiles(profile_set):
+    d = get_immediate_subdirectories(profile_set)
+    domain = choice(d)
+    return [profile_set + "/" + domain + "/profileA.json", profile_set+ "/" + domain + "/profileB.json"]
+
+def get_immediate_subdirectories(a_dir):
+    return [name for name in os.listdir(a_dir) if os.path.isdir(os.path.join(a_dir, name))]
 
 def process_results(results_class: SAOPState, results_dict: dict):
     # dict to translate geniusweb agent reference to Python class name
@@ -291,3 +337,65 @@ def process_tournament_results(tournament_results):
     tournament_results_summary = tournament_results_summary[column_order]
 
     return tournament_results_summary
+
+def process_marketplace_results(marketplace_results):
+    agent_result_raw = defaultdict(lambda: defaultdict(list))
+    marketplace_results_summary = defaultdict(lambda: defaultdict(int))
+    for session_results in marketplace_results:
+        agents = {k: v for k, v in session_results.items() if k.startswith("agent")}
+        for agent_id, agent_class in agents.items():
+            agent_result_raw[agent_class]["utility"].append(
+                session_results[f"utility_{agent_id.split('_')[1]}"]
+            )
+            agent_result_raw[agent_class]["nash_product"].append(
+                session_results["nash_product"]
+            )
+            agent_result_raw[agent_class]["social_welfare"].append(
+                session_results["social_welfare"]
+            )
+            if "num_offers" in session_results:
+                agent_result_raw[agent_class]["num_offers"].append(
+                    session_results["num_offers"]
+                )
+            marketplace_results_summary[agent_class][session_results["result"]] += 1
+
+    for agent, stats in agent_result_raw.items():
+        num_session = len(stats["utility"])
+        for desc, stat in stats.items():
+            stat_average = sum(stat) / num_session
+            marketplace_results_summary[agent][f"avg_{desc}"] = stat_average
+        marketplace_results_summary[agent]["count"] = num_session
+
+    column_order = [
+        "avg_utility",
+        "avg_nash_product",
+        "avg_social_welfare",
+        "avg_num_offers",
+        "count",
+        "agreement",
+        "failed",
+        "ERROR",
+    ]
+    column_type = {
+        "count": int,
+        "agreement": int,
+        "failed": int,
+        "ERROR": int,
+    }
+
+    # results dictionary to dataframe
+    marketplace_results_summary = pd.DataFrame(marketplace_results_summary).T
+
+    # clean data and types
+    marketplace_results_summary = marketplace_results_summary.fillna(0)
+    for column in column_order:
+        if column not in marketplace_results_summary:
+            marketplace_results_summary[column] = 0
+    marketplace_results_summary = marketplace_results_summary.astype(column_type)
+
+    # structure dataframe
+    marketplace_results_summary.sort_values("avg_utility", ascending=False, inplace=True)
+    marketplace_results_summary = marketplace_results_summary[column_order]
+
+    return marketplace_results_summary
+
