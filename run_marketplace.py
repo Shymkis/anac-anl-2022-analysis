@@ -5,21 +5,24 @@ import time
 
 from utils.runners import run_marketplace
 
-RESULTS_DIR = Path("results", time.strftime('%Y%m%d-%H%M%S'))
-
-# create results directory if it does not exist
-if not RESULTS_DIR.exists():
-    RESULTS_DIR.mkdir(parents=True)
-
 # Settings to run a negotiation session:
 #   You need to specify the classpath of 2 agents to start a negotiation. Parameters for the agent can be added as a dict (see example)
 #   You need to specify the preference profiles for both agents. The first profile will be assigned to the first agent.
 #   You need to specify a time deadline (is milliseconds (ms)) we are allowed to negotiate before we end without agreement.
+dist = [0.25, 0.25, 0.25, 0.25]
+domain = "o+5"
+deadline = 10000
 marketplace_settings = {
-    "agent_distribution": [0.25, 0.25, 0.25, 0.25],
-    "profile_set": "domains/basic",
-    "deadline_time_ms": 10000,
+    "agent_distribution": dist,
+    "profile_set": "domains/" + domain,
+    "deadline_time_ms": deadline,
 }
+
+RESULTS_DIR = Path("results", str(dist) + " " + str(domain) + " " + str(deadline) + "ms")
+
+# create results directory if it does not exist
+if not RESULTS_DIR.exists():
+    RESULTS_DIR.mkdir(parents=True)
 
 # run a session and obtain results in dictionaries
 marketplace_steps, marketplace_results, marketplace_results_summary = run_marketplace(marketplace_settings)
