@@ -16,12 +16,7 @@ if not RESULTS_DIR.exists():
 #   You need to specify the preference profiles for both agents. The first profile will be assigned to the first agent.
 #   You need to specify a time deadline (is milliseconds (ms)) we are allowed to negotiate before we end without agreement.
 marketplace_settings = {
-    "agent_distribution": {
-        "conceder": 1,
-        "boulware": 1,
-        "hardliner": 1,
-        "micro": 1
-    },
+    "agent_distribution": [0.25, 0.25, 0.25, 0.25],
     "profile_set": "domains/basic",
     "deadline_time_ms": 10000,
 }
