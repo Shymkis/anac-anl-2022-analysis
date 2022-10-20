@@ -10,7 +10,7 @@ from utils.runners import run_marketplace
 #   You need to specify the preference profiles for both agents. The first profile will be assigned to the first agent.
 #   You need to specify a time deadline (is milliseconds (ms)) we are allowed to negotiate before we end without agreement.
 dist = [0.25, 0.25, 0.25, 0.25]
-domain = "basic"
+domain = "default_domains"
 deadline = 10000
 marketplace_settings = {
     "agent_distribution": dist,

@@ -2,7 +2,7 @@ from http.client import SWITCHING_PROTOCOLS
 import shutil
 from collections import defaultdict
 from itertools import permutations
-from math import factorial, prod
+from math import factorial, prod, sqrt
 import os
 from pathlib import Path
 from random import choice, choices
@@ -364,14 +364,20 @@ def process_marketplace_results(marketplace_results):
         num_session = len(stats["utility"])
         for desc, stat in stats.items():
             stat_average = sum(stat) / num_session
+            stat_std = sqrt(sum([(s - stat_average)**2 for s in stat]) / (num_session - 1))
             marketplace_results_summary[agent][f"avg_{desc}"] = stat_average
+            marketplace_results_summary[agent][f"std_{desc}"] = stat_std
         marketplace_results_summary[agent]["count"] = num_session
 
     column_order = [
         "avg_utility",
+        "std_utility",
         "avg_nash_product",
+        "std_nash_product",
         "avg_social_welfare",
+        "std_social_welfare",
         "avg_num_offers",
+        "std_num_offers",
         "count",
         "agreement",
         "failed",
