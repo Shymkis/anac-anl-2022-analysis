@@ -15,11 +15,13 @@ dist = [0.25, 0.25, 0.25, 0.25]
 domain = "basic"
 deadline = 10000
 endtime = 500.0
+count = 3000
 marketplace_settings = {
     "agent_distribution": dist,
     "profile_set": "domains/" + domain,
     "deadline_time_ms": deadline,
     "endtime": endtime,
+    "count": count,
 }
 
 RESULTS_DIR = Path("results", str(dist) + " " + str(domain) + " " + str(endtime))

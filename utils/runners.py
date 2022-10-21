@@ -169,7 +169,8 @@ def run_marketplace(marketplace_settings: dict) -> Tuple[list, list]:
 
     marketplace_results = []
     marketplace_steps = []
-    for _ in range(3000):
+    count = marketplace_settings["count"]
+    for _ in range(count):
         # create session settings dict
         settings = {
             "agents": sample_agents(agent_distribution),
@@ -185,7 +186,7 @@ def run_marketplace(marketplace_settings: dict) -> Tuple[list, list]:
         marketplace_steps.append(settings)
         marketplace_results.append(session_results_summary)
 
-    marketplace_results_summary = process_marketplace_results(marketplace_results)
+    marketplace_results_summary = process_marketplace_results(marketplace_steps, marketplace_results)
 
     return marketplace_steps, marketplace_results, marketplace_results_summary
 
@@ -341,7 +342,7 @@ def process_tournament_results(tournament_results):
 
     return tournament_results_summary
 
-def process_marketplace_results(marketplace_results):
+def process_marketplace_results(marketplace_steps, marketplace_results):
     agent_result_raw = defaultdict(lambda: defaultdict(list))
     marketplace_results_summary = defaultdict(lambda: defaultdict(int))
     for session_results in marketplace_results:
