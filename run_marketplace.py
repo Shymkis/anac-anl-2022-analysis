@@ -9,8 +9,10 @@ from utils.runners import run_marketplace
 #   You need to specify the classpath of 2 agents to start a negotiation. Parameters for the agent can be added as a dict (see example)
 #   You need to specify the preference profiles for both agents. The first profile will be assigned to the first agent.
 #   You need to specify a time deadline (is milliseconds (ms)) we are allowed to negotiate before we end without agreement.
-dist = [0.25, 0.25, 0.25, 0.25]
-domain = "default_domains"
+
+# [Conceder, Boulware, Hardliner, MiCRO]
+dist = [0.10, 0.10, 0.10, 0.70]
+domain = "basic"
 deadline = 10000
 marketplace_settings = {
     "agent_distribution": dist,
