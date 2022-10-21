@@ -169,7 +169,7 @@ def run_marketplace(marketplace_settings: dict) -> Tuple[list, list]:
 
     marketplace_results = []
     marketplace_steps = []
-    for _ in range(10):
+    for _ in range(3000):
         # create session settings dict
         settings = {
             "agents": sample_agents(agent_distribution),
