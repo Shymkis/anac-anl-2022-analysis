@@ -165,15 +165,17 @@ def run_marketplace(marketplace_settings: dict) -> Tuple[list, list]:
     agent_distribution = marketplace_settings["agent_distribution"]
     profile_set = marketplace_settings["profile_set"]
     deadline_time_ms = marketplace_settings["deadline_time_ms"]
+    endtime = marketplace_settings["endtime"]
 
     marketplace_results = []
     marketplace_steps = []
-    for _ in range(3000):
+    for _ in range(10):
         # create session settings dict
         settings = {
             "agents": sample_agents(agent_distribution),
             "profiles": sample_profiles(profile_set),
             "deadline_time_ms": deadline_time_ms,
+            "endtime": endtime,
         }
 
         # run a single negotiation session

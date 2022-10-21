@@ -11,16 +11,18 @@ from utils.runners import run_marketplace
 #   You need to specify a time deadline (is milliseconds (ms)) we are allowed to negotiate before we end without agreement.
 
 # [Conceder, Boulware, Hardliner, MiCRO]
-dist = [0.10, 0.10, 0.10, 0.70]
+dist = [0.25, 0.25, 0.25, 0.25]
 domain = "basic"
 deadline = 10000
+endtime = 500.0
 marketplace_settings = {
     "agent_distribution": dist,
     "profile_set": "domains/" + domain,
     "deadline_time_ms": deadline,
+    "endtime": endtime,
 }
 
-RESULTS_DIR = Path("results", str(dist) + " " + str(domain) + " " + str(deadline) + "ms")
+RESULTS_DIR = Path("results", str(dist) + " " + str(domain) + " " + str(endtime))
 
 # create results directory if it does not exist
 if not RESULTS_DIR.exists():
