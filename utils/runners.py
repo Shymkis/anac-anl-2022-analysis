@@ -252,9 +252,11 @@ def process_results(results_class: SAOPState, results_dict: dict):
         # gather a summary of results
         if "Accept" in action_dict:
             utilities_final = list(offer["utilities"].values())
+            bid_final = action_dict["Accept"]["bid"]
             result = "agreement"
         else:
             utilities_final = [0, 0]
+            bid_final = {}
             result = "failed"
     else:
         utilities_final = [0, 0]
@@ -267,6 +269,7 @@ def process_results(results_class: SAOPState, results_dict: dict):
     results_summary["nash_product"] = prod(utilities_final)
     results_summary["social_welfare"] = sum(utilities_final)
     results_summary["result"] = result
+    results_summary["final_bid"] = bid_final
 
     return results_dict, results_summary
 
