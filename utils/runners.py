@@ -216,6 +216,7 @@ def process_results(results_class: SAOPState, results_dict: dict):
     }
 
     results_summary = {"num_offers": 0}
+    bid_final = {}
 
     # check if there are any actions (could have crashed)
     if results_dict["actions"]:
